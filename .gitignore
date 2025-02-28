@@ -1,0 +1,49 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Optional: If you sometimes compile to /lib or /out
+lib/
+out/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS-specific or editor-specific files
+.DS_Store
+Thumbs.db
+
+# Environment/credentials
+.env
+.env.*   # e.g. .env.development, .env.production
+service-account.json
+
+# Temporary folders
+tmp/
+uploads/
+
+# Optional coverage outputs
+coverage/
+*.lcov
+
+# SASS cache (if you use SASS)
+.sass-cache/
+
+# IDE settings (VSCode, JetBrains, etc.)
+.vscode/
+.idea/
+
+# Because you’re using pnpm, you typically keep pnpm-lock.yaml
+# but if you want to ignore it, uncomment:
+# pnpm-lock.yaml
+
+# macOS ._ files
+._*
