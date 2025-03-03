@@ -6,6 +6,9 @@ import { dbConfig } from './config/mongodb.config'
 import billRoutes from './routes/bill.routes'
 import authRoutes from './routes/auth.routes'
 
+// middlewares
+import protect from './middlewares/auth.middleware'
+
 const app = express()
 
 mongoose.connect(dbConfig.connectionString)

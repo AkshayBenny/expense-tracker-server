@@ -10,12 +10,13 @@ declare global {
 		}
 	}
 }
-const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
+const protect = (req: Request, res: Response, next: NextFunction) => {
 	const authHeader = req.headers.authorization
 	const token = authHeader && authHeader.split(' ')[1]
 
 	if (!token) {
-		return res.status(401).json({ message: 'No token provided' })
+		res.status(401).json({ message: 'No token provided' })
+		return
 	}
 
 	try {
@@ -23,8 +24,9 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
 		req.user = decoded
 		next()
 	} catch (error: any) {
-		return res.status(401).json({ message: error.message })
+		res.status(401).json({ message: error.message })
+		return
 	}
 }
 
-export default authenticateToken
+export default protect

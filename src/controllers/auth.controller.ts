@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import User from '../models/user.model'
 import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '../config/env'
+import bcrypt from 'bcryptjs'
 export async function signUpController(
 	req: Request,
 	res: Response
@@ -9,16 +10,8 @@ export async function signUpController(
 	try {
 		const { name, email, password } = req.body
 
-		if (!name) {
-			res.status(400).json({ message: 'Name is required' })
-			return
-		}
-		if (!email) {
-			res.status(400).json({ message: 'Email is required' })
-			return
-		}
-		if (!password) {
-			res.status(400).json({ message: 'Password is required' })
+		if (!name || !email || !password) {
+			res.status(400).json({ message: 'All fields are required' })
 			return
 		}
 
@@ -28,8 +21,8 @@ export async function signUpController(
 			return
 		}
 
-		// *************** Encrypt password ***************
-		const newUser = new User({ name, email, password })
+		const hashedPassword = await bcrypt.hash(password, 10)
+		const newUser = new User({ name, email, password: hashedPassword })
 		await newUser.save()
 
 		const accessToken = jwt.sign({ newUser }, JWT_SECRET, {
@@ -44,11 +37,12 @@ export async function signUpController(
 
 		return
 	} catch (error) {
-		if (error instanceof Error) {
-			res.status(400).json({ message: error.message })
-		} else {
-			res.status(400).json({ message: 'An unexpected error occurred' })
-		}
+		res.status(400).json({
+			message:
+				error instanceof Error
+					? error.message
+					: 'An unexpected error occurred',
+		})
 		return
 	}
 }
@@ -59,16 +53,13 @@ export async function loginController(
 ): Promise<void> {
 	try {
 		const { email, password } = req.body
-		if (!email) {
-			res.status(400).json({ message: 'Email is required' })
-			return
-		}
-		if (!password) {
-			res.status(400).json({ message: 'Password is required' })
+
+		if (!email || !password) {
+			res.status(400).json({ message: 'Email and password are required' })
 			return
 		}
 
-		const user = await User.findOne({ email: email })
+		const user = await User.findOne({ email }).select('+password')
 
 		if (!user) {
 			res.json(400).json({ message: 'User does not exist' })
@@ -76,11 +67,12 @@ export async function loginController(
 		}
 
 		// *************** Encrypt password ***************
-		if (user.email !== email && user.password !== password) {
-			res.status(400).json({ message: 'Credentials do no match' })
+		const isPasswordMatch = await bcrypt.compare(password, user.password)
+		if (!isPasswordMatch && user.email !== email) {
+			res.status(400).json({ message: 'Invalid credentials' })
 			return
 		}
-        
+
 		const accessToken = jwt.sign({ user }, JWT_SECRET, {
 			expiresIn: '12h',
 		})
@@ -91,10 +83,12 @@ export async function loginController(
 		})
 		return
 	} catch (error) {
-		if (error instanceof Error) {
-			res.status(400).json({ message: error.message })
-		} else {
-			res.status(400).json({ message: 'An unexpected error occurred' })
-		}
+		res.status(400).json({
+			message:
+				error instanceof Error
+					? error.message
+					: 'An unexpected error occurred',
+		})
+		return
 	}
 }

@@ -22,6 +22,7 @@ const userSchema: Schema<User> = new Schema({
 	password: {
 		type: String,
 		required: true,
+		select: false,
 	},
 
 	createdAt: {
