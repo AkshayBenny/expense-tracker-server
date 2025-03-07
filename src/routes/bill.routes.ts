@@ -5,12 +5,13 @@ import protect from '../middlewares/auth.middleware'
 
 const router = Router()
 
-// POST /process-bill
 router.post(
 	'/process-bill',
 	protect,
 	upload.single('bill'),
 	processBillController
 )
+
+router.post('/process-bill/free', upload.single('bill'), processBillController)
 
 export default router
