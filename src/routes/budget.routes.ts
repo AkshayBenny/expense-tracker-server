@@ -1,9 +1,11 @@
 import { Router } from 'express'
 import protect from '../middlewares/auth.middleware'
-import { addBudgetController } from '../controllers/budget.controller'
+import { addBudgetController, getUserBudget } from '../controllers/budget.controller'
 
 const router = Router()
 
-router.post('/budget/add', protect, addBudgetController)
+router.post('/add', protect, addBudgetController)
+router.get('/add', protect, getUserBudget)
+router.post('/add/free', addBudgetController)
 
-router.post('/budget/add/free', addBudgetController)
+export default router
