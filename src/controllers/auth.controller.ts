@@ -3,6 +3,7 @@ import User from '../models/user.model'
 import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '../config/env'
 import bcrypt from 'bcryptjs'
+
 export async function signUpController(
 	req: Request,
 	res: Response
@@ -15,7 +16,7 @@ export async function signUpController(
 			return
 		}
 
-		const isUser = await User.findOne({ email: email })
+		const isUser = await User.findOne({ email })
 		if (isUser) {
 			res.status(400).json({ message: 'Email already exists' })
 			return
@@ -25,17 +26,23 @@ export async function signUpController(
 		const newUser = new User({ name, email, password: hashedPassword })
 		await newUser.save()
 
-		const accessToken = jwt.sign({ newUser }, JWT_SECRET, {
+		const tokenPayload = {
+			_id: String(newUser._id),
+			name: newUser.name,
+			email: newUser.email,
+			monthlyBudget: newUser.monthlyBudget,
+			currency: newUser.currency,
+		}
+
+		const accessToken = jwt.sign({ user: tokenPayload }, JWT_SECRET, {
 			expiresIn: '12h',
 		})
 
 		res.status(201).json({
-			message: 'Signed in successfully',
+			message: 'Signed up successfully',
 			token: accessToken,
-			user: newUser,
+			user: tokenPayload,
 		})
-
-		return
 	} catch (error) {
 		res.status(400).json({
 			message:
@@ -43,7 +50,6 @@ export async function signUpController(
 					? error.message
 					: 'An unexpected error occurred',
 		})
-		return
 	}
 }
 
@@ -62,26 +68,35 @@ export async function loginController(
 		const user = await User.findOne({ email }).select('+password')
 
 		if (!user) {
-			res.json(400).json({ message: 'User does not exist' })
+			res.status(400).json({ message: 'User does not exist' })
 			return
 		}
 
-		// *************** Encrypt password ***************
 		const isPasswordMatch = await bcrypt.compare(password, user.password)
-		if (!isPasswordMatch && user.email !== email) {
+		if (!isPasswordMatch) {
 			res.status(400).json({ message: 'Invalid credentials' })
 			return
 		}
 
-		const accessToken = jwt.sign({ user }, JWT_SECRET, {
+		// Build a flat user payload.
+		const tokenPayload = {
+			_id: String(user._id),
+			name: user.name,
+			email: user.email,
+			monthlyBudget: user.monthlyBudget,
+			currency: user.currency,
+		}
+
+		// Sign the token with a nested "user" property.
+		const accessToken = jwt.sign({ user: tokenPayload }, JWT_SECRET, {
 			expiresIn: '12h',
 		})
 
 		res.status(200).json({
 			message: 'Logged in successfully',
 			token: accessToken,
+			user: tokenPayload,
 		})
-		return
 	} catch (error) {
 		res.status(400).json({
 			message:
@@ -89,6 +104,5 @@ export async function loginController(
 					? error.message
 					: 'An unexpected error occurred',
 		})
-		return
 	}
 }
