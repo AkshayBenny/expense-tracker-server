@@ -5,7 +5,7 @@ import { addBudgetController, getUserBudget } from '../controllers/budget.contro
 const router = Router()
 
 router.post('/add', protect, addBudgetController)
-router.get('/add', protect, getUserBudget)
+router.get('/', protect, getUserBudget)
 router.post('/add/free', addBudgetController)
 
 export default router

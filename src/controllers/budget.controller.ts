@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import Budget from '../models/budget'
+import Budget from '../models/budget.model'
 
 export async function addBudgetController(
 	req: Request,
