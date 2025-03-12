@@ -3,6 +3,7 @@ import User from '../models/user.model'
 import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '../config/env'
 import bcrypt from 'bcryptjs'
+import Budget from '../models/budget.model'
 
 export async function signUpController(
 	req: Request,
@@ -24,13 +25,17 @@ export async function signUpController(
 
 		const hashedPassword = await bcrypt.hash(password, 10)
 		const newUser = new User({ name, email, password: hashedPassword })
-		await newUser.save()
+		const user = await newUser.save()
+
+		const budgetRecord = await Budget.findOne({
+			user: user._id,
+		})
 
 		const tokenPayload = {
 			_id: String(newUser._id),
 			name: newUser.name,
 			email: newUser.email,
-			monthlyBudget: newUser.monthlyBudget,
+			monthlyBudget: budgetRecord ? budgetRecord : newUser.monthlyBudget,
 			currency: newUser.currency,
 		}
 
@@ -78,12 +83,16 @@ export async function loginController(
 			return
 		}
 
+		const budgetRecord = await Budget.findOne({
+			user: user._id,
+		})
+
 		// Build a flat user payload.
 		const tokenPayload = {
 			_id: String(user._id),
 			name: user.name,
 			email: user.email,
-			monthlyBudget: user.monthlyBudget,
+			monthlyBudget: budgetRecord ? budgetRecord : user.monthlyBudget,
 			currency: user.currency,
 		}
 
