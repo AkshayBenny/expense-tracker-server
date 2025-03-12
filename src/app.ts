@@ -33,7 +33,7 @@ app.use('/expense', expenseRoutes)
 app.use('/auth', authRoutes)
 
 // test
-app.use('/test', (req: Request, res: Response) => {
+app.get('/test', (req: Request, res: Response) => {
 	res.json({ message: 'Test route' })
 })
 
