@@ -32,6 +32,11 @@ app.use('/budget', budgetRoutes)
 app.use('/expense', expenseRoutes)
 app.use('/auth', authRoutes)
 
+// test
+app.use('/test', (req: Request, res: Response) => {
+	res.json({ message: 'Test route' })
+})
+
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 	logger.error(`Error: ${err.message}`)
