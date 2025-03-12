@@ -8,17 +8,29 @@ export async function addManualExpenseController(
 	try {
 		const { expenses } = req.body
 		if (!expenses || !Array.isArray(expenses) || expenses.length === 0) {
-			res.status(400).json({ message: 'No expenses provided' })
+			res.status(400).json({
+				error: true,
+				message: 'No expenses provided',
+			})
 			return
 		}
 
 		let totalExpense = 0
-		expenses.forEach((expense: any) => {
-			totalExpense += Number(expense.price) * Number(expense.quantity)
-		})
+		for (const expense of expenses) {
+			const price = Number(expense.price)
+			const quantity = Number(expense.quantity)
+			if (isNaN(price) || isNaN(quantity)) {
+				res.status(400).json({
+					error: true,
+					message: 'Invalid expense values provided',
+				})
+				return
+			}
+			totalExpense += price * quantity
+		}
 
 		if (!req.user || !req.user.user || !req.user.user._id) {
-			res.status(401).json({ message: 'Unauthorized' })
+			res.status(401).json({ error: true, message: 'Unauthorized' })
 			return
 		}
 		const userId = req.user.user._id
@@ -32,18 +44,20 @@ export async function addManualExpenseController(
 			budgetRecord.budget = budgetRecord.budget - totalExpense
 			await budgetRecord.save()
 		} else {
-			res.status(400).json({
+			res.status(404).json({
+				error: true,
 				message: 'Budget record not found for current month',
 			})
 			return
 		}
 
 		res.status(200).json({
+			error: false,
 			message: 'Expenses added successfully and budget updated',
 			totalExpense,
 		})
+		return
 	} catch (error) {
-		console.error('Error adding expense:', error)
-		res.status(500).json({ error: 'Error adding expense' })
+		res.status(500).json({ error: true, message: 'Error adding expense' })
 	}
 }

@@ -44,7 +44,7 @@ app.get('/health', (req, res) => {
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 	logger.error(`Error: ${err.message}`)
-	res.status(500).send('Internal Server Error')
+	res.status(500).json({ error: true, message: 'Internal Server Error' })
 })
 
 export default app

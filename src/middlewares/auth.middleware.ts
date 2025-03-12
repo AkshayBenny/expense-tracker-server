@@ -27,7 +27,7 @@ const protect = (req: Request, res: Response, next: NextFunction) => {
 	const token = authHeader && authHeader.split(' ')[1]
 
 	if (!token) {
-		res.status(401).json({ message: 'No token provided' })
+		res.status(401).json({ error: true, message: 'No token provided' })
 		return
 	}
 
@@ -37,7 +37,7 @@ const protect = (req: Request, res: Response, next: NextFunction) => {
 		req.user = decoded
 		next()
 	} catch (error: any) {
-		res.status(401).json({ message: error.message })
+		res.status(401).json({ error: true, message: error.message })
 		return
 	}
 }

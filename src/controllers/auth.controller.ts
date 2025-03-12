@@ -42,13 +42,13 @@ export async function signUpController(
 			message: 'Signed up successfully',
 			token: accessToken,
 			user: tokenPayload,
+			error: false,
 		})
 	} catch (error) {
 		res.status(400).json({
+			error: true,
 			message:
-				error instanceof Error
-					? error.message
-					: 'An unexpected error occurred',
+				error instanceof Error ? error.message : 'Signing up failed',
 		})
 	}
 }
@@ -96,9 +96,11 @@ export async function loginController(
 			message: 'Logged in successfully',
 			token: accessToken,
 			user: tokenPayload,
+			error: false,
 		})
 	} catch (error) {
 		res.status(400).json({
+			error: true,
 			message:
 				error instanceof Error
 					? error.message

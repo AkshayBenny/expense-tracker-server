@@ -11,7 +11,10 @@ export async function processBillController(
 ): Promise<void> {
 	try {
 		if (!req.file) {
-			res.status(400).json({ error: 'No bill file provided' })
+			res.status(400).json({
+				error: true,
+				message: 'No bill file provided',
+			})
 			return
 		}
 
@@ -35,13 +38,15 @@ export async function processBillController(
 
 		const totalAmount = structuredData.totalAmount
 		if (typeof totalAmount !== 'number') {
-			throw new Error(
-				'Total amount is missing or invalid in structured data'
-			)
+			res.status(401).json({
+				message: 'Total amount must be a number',
+				error: true,
+			})
+			return
 		}
 
 		if (!req.user || !req.user.user || !req.user.user._id) {
-			res.status(401).json({ message: 'Unauthorized' })
+			res.status(401).json({ error: true, message: 'Unauthorized' })
 			return
 		}
 		const userId = req.user.user._id
@@ -58,8 +63,8 @@ export async function processBillController(
 			budgetRecord.budget = budgetRecord.budget - totalAmount
 			await budgetRecord.save()
 		} else {
-			// Optionally, you could create a new budget record if it doesn't exist.
 			res.status(400).json({
+				error: true,
 				message: 'Budget record not found for current month',
 			})
 			return
@@ -67,11 +72,12 @@ export async function processBillController(
 
 		// Send the structured JSON response.
 		res.json({
+			error: false,
 			message: 'Bill processed successfully',
-			structuredData, // This is now a JSON object with items, totalAmount, etc.
+			data: structuredData,
 		})
 	} catch (error) {
 		console.error('Error processing bill:', error)
-		res.status(500).json({ error: 'Error processing bill' })
+		res.status(500).json({ error: true, message: 'Error processing bill' })
 	}
 }
