@@ -37,6 +37,10 @@ app.get('/test', (req: Request, res: Response) => {
 	res.json({ message: 'Test route' })
 })
 
+app.get('/health', (req, res) => {
+	res.sendStatus(200)
+})
+
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 	logger.error(`Error: ${err.message}`)
