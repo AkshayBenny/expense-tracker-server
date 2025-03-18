@@ -8,6 +8,8 @@ export interface User extends Document {
 	currency: string
 	createdAt: Date
 	updatedAt: Date
+	resetPasswordToken?: string
+	resetPasswordExpires?: Date
 }
 
 const userSchema: Schema<User> = new Schema({
@@ -49,6 +51,8 @@ const userSchema: Schema<User> = new Schema({
 		type: Date,
 		default: Date.now,
 	},
+	resetPasswordToken: { type: String },
+	resetPasswordExpires: { type: Date },
 })
 
 userSchema.pre('save', function (next) {

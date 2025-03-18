@@ -10,6 +10,9 @@ export async function processBillController(
 	req: Request,
 	res: Response
 ): Promise<void> {
+	console.log('DEBUG: Headers:', req.headers)
+	console.log('DEBUG: Body:', req.body)
+	console.log('DEBUG: File:', req.file)
 	try {
 		if (!req.file) {
 			res.status(400).json({
