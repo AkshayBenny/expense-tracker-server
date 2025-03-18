@@ -15,7 +15,6 @@ export async function structureBillData(rawText: string): Promise<any> {
     ${rawText}
   `
 
-    console.log('DEBUG: Prompt for Gemini API:', prompt)
 
     try {
         const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY)
@@ -23,14 +22,12 @@ export async function structureBillData(rawText: string): Promise<any> {
 
         const result = await model.generateContent(prompt)
         let responseText = result.response.text()
-        console.log('DEBUG: Gemini API raw response:', responseText)
 
         // Improved markdown code block extraction
         const codeBlockRegex = /```(?:[a-z]+)?\n([\s\S]*?)```/
         const match = responseText.match(codeBlockRegex)
         if (match) {
             responseText = match[1].trim()
-            console.log('DEBUG: Extracted JSON from code block:', responseText)
         } else {
             // Fallback: remove any remaining backticks
             responseText = responseText.replace(/```/g, '').trim()
@@ -38,11 +35,9 @@ export async function structureBillData(rawText: string): Promise<any> {
 
         // Remove non-printable characters
         responseText = responseText.replace(/[\u200B-\u200D\uFEFF]/g, '')
-        console.log('DEBUG: Final cleaned response text:', responseText)
 
         try {
             const structuredData = JSON.parse(responseText)
-            console.log('DEBUG: Parsed structured data:', structuredData)
             return structuredData
         } catch (parseError: any) {
             console.error('JSON parsing failed:', {
