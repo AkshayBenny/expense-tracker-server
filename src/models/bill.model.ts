@@ -30,35 +30,3 @@ const billSchema: Schema<Bill> = new Schema({
 
 const Bill: Model<Bill> = mongoose.model<Bill>('Bill', billSchema)
 export default Bill
-// {
-//     "message": "Bill processed successfully",
-//     "structuredData": {
-//         "items": [
-//             {
-//                 "name": "T-Shirt",
-//                 "price": 25.5,
-//                 "quantity": 1,
-//                 "category": "Clothing"
-//             },
-//             {
-//                 "name": "Watches",
-//                 "price": 299,
-//                 "quantity": 1,
-//                 "category": "Accessories"
-//             },
-//             {
-//                 "name": "Pants",
-//                 "price": 32.99,
-//                 "quantity": 1,
-//                 "category": "Clothing"
-//             },
-//             {
-//                 "name": "Socks",
-//                 "price": 6.5,
-//                 "quantity": 1,
-//                 "category": "Clothing"
-//             }
-//         ],
-//         "totalAmount": 363.99
-//     }
-// }

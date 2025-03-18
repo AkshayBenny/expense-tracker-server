@@ -15,6 +15,11 @@ export async function addManualExpenseController(
 			return
 		}
 
+		if (!req.user || !req.user.user || !req.user.user._id) {
+			res.status(401).json({ error: true, message: 'Unauthorized' })
+			return
+		}
+
 		let totalExpense = 0
 		for (const expense of expenses) {
 			const price = Number(expense.price)
@@ -29,10 +34,6 @@ export async function addManualExpenseController(
 			totalExpense += price * quantity
 		}
 
-		if (!req.user || !req.user.user || !req.user.user._id) {
-			res.status(401).json({ error: true, message: 'Unauthorized' })
-			return
-		}
 		const userId = req.user.user._id
 
 		const now = new Date()
