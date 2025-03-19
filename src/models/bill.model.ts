@@ -10,6 +10,7 @@ export interface Bill extends Document {
 	}[]
 	totalAmount: number
 	rawText?: string
+	shopName: string
 	createdAt: Date
 }
 
@@ -23,6 +24,7 @@ const billSchema: Schema<Bill> = new Schema({
 			category: { type: String },
 		},
 	],
+	shopName: { type: String, default: 'Unknown' },
 	totalAmount: { type: Number, required: true },
 	rawText: { type: String },
 	createdAt: { type: Date, default: Date.now },

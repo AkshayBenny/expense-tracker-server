@@ -142,11 +142,11 @@ export async function forgotPasswordController(
 
 		const resetToken = crypto.randomBytes(20).toString('hex')
 		user.resetPasswordToken = resetToken
-		user.resetPasswordExpires = new Date(Date.now() + 3600000) // 1 hour from now
+		user.resetPasswordExpires = new Date(Date.now() + 3600000)
 		await user.save()
 
 		// Replace "myapp" with your actual custom scheme.
-		const resetURL = `myapp://reset-password/${resetToken}`
+		const resetURL = `expense_tracker://reset-password/${resetToken}`
 
 		const transporter = nodemailer.createTransport({
 			service: 'Gmail',

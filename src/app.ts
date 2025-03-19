@@ -7,7 +7,7 @@ import billRoutes from './routes/bill.routes'
 import authRoutes from './routes/auth.routes'
 import budgetRoutes from './routes/budget.routes'
 import expenseRoutes from './routes/expense.routes'
-import protect from './middlewares/auth.middleware'
+import analyticsRoutes from './routes/analytic.routes'
 import logger from './config/logger'
 
 const app = express()
@@ -31,6 +31,7 @@ app.use('/', billRoutes)
 app.use('/budget', budgetRoutes)
 app.use('/expense', expenseRoutes)
 app.use('/auth', authRoutes)
+app.use('/analytics', analyticsRoutes)
 
 // test
 app.get('/test', (req: Request, res: Response) => {
