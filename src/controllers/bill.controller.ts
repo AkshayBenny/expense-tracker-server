@@ -10,9 +10,6 @@ export async function processBillController(
 	req: Request,
 	res: Response
 ): Promise<void> {
-	console.log('DEBUG: Headers:', req.headers)
-	console.log('DEBUG: Body:', req.body)
-	console.log('DEBUG: File:', req.file)
 	try {
 		if (!req.file) {
 			res.status(400).json({
@@ -71,6 +68,7 @@ export async function processBillController(
 			user: userId,
 			items: structuredData.items,
 			totalAmount: totalAmount,
+			shopName: structuredData.shopName || 'Unknown',
 			rawText: rawText,
 			createdAt: now,
 		})
