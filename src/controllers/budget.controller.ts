@@ -1,6 +1,12 @@
 import { Request, Response } from 'express'
 import Budget from '../models/budget.model'
 
+function getUserId(req: Request): string | null {
+	return req.user && req.user.user && req.user.user._id
+		? req.user.user._id
+		: null
+}
+
 export async function addBudgetController(
 	req: Request,
 	res: Response

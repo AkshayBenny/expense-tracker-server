@@ -27,17 +27,13 @@ export async function signUpController(
 
 		const hashedPassword = await bcrypt.hash(password, 10)
 		const newUser = new User({ name, email, password: hashedPassword })
-		const user = await newUser.save()
-
-		const budgetRecord = await Budget.findOne({
-			user: user._id,
-		})
+		await newUser.save()
 
 		const tokenPayload = {
 			_id: String(newUser._id),
 			name: newUser.name,
 			email: newUser.email,
-			monthlyBudget: budgetRecord ? budgetRecord : newUser.monthlyBudget,
+			monthlyBudget: null,
 			currency: newUser.currency,
 		}
 
@@ -73,7 +69,6 @@ export async function loginController(
 		}
 
 		const user = await User.findOne({ email }).select('+password')
-
 		if (!user) {
 			res.status(400).json({ message: 'User does not exist' })
 			return
@@ -85,20 +80,16 @@ export async function loginController(
 			return
 		}
 
-		const budgetRecord = await Budget.findOne({
-			user: user._id,
-		})
+		const budgetRecord = await Budget.findOne({ user: user._id })
 
-		// Build a flat user payload.
 		const tokenPayload = {
 			_id: String(user._id),
 			name: user.name,
 			email: user.email,
-			monthlyBudget: budgetRecord ? budgetRecord : user.monthlyBudget,
+			monthlyBudget: budgetRecord ? budgetRecord.budget : null,
 			currency: user.currency,
 		}
 
-		// Sign the token with a nested "user" property.
 		const accessToken = jwt.sign({ user: tokenPayload }, JWT_SECRET, {
 			expiresIn: '12h',
 		})
