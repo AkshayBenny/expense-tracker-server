@@ -1,7 +1,11 @@
 import { Request, Response } from 'express'
 import User from '../models/user.model'
 import jwt from 'jsonwebtoken'
-import { GMAIL_APP_PASSWORD, JWT_SECRET } from '../config/env'
+import {
+	GMAIL_APP_PASSWORD,
+	JWT_SECRET,
+	REFRESH_TOKEN_SECRET,
+} from '../config/env'
 import bcrypt from 'bcryptjs'
 import Budget from '../models/budget.model'
 import crypto from 'crypto'
@@ -94,9 +98,18 @@ export async function loginController(
 			expiresIn: '12h',
 		})
 
+		const refreshToken = jwt.sign(
+			{ user: tokenPayload },
+			REFRESH_TOKEN_SECRET,
+			{
+				expiresIn: '30d',
+			}
+		)
+
 		res.status(200).json({
 			message: 'Logged in successfully',
 			token: accessToken,
+			refreshToken,
 			user: tokenPayload,
 			error: false,
 		})
@@ -220,6 +233,54 @@ export async function resetPasswordController(
 		res.status(500).json({
 			error: true,
 			message: 'Error resetting password',
+		})
+	}
+}
+
+export async function refreshTokenController(
+	req: Request,
+	res: Response
+): Promise<void> {
+	try {
+		const { refreshToken } = req.body
+		if (!refreshToken) {
+			res.status(400).json({
+				error: true,
+				message: 'Refresh token is required',
+			})
+			return
+		}
+
+		jwt.verify(
+			refreshToken,
+			REFRESH_TOKEN_SECRET,
+			(err: any, decoded: any) => {
+				if (err) {
+					res.status(401).json({
+						error: true,
+						message: 'Invalid or expired refresh token',
+					})
+					return
+				}
+
+				// Extract the user payload from the decoded token.
+				const userPayload = (decoded as any).user
+
+				// Sign a new access token with the user payload.
+				const newAccessToken = jwt.sign(
+					{ user: userPayload },
+					JWT_SECRET,
+					{
+						expiresIn: '12h',
+					}
+				)
+				res.status(200).json({ error: false, token: newAccessToken })
+			}
+		)
+	} catch (error: any) {
+		res.status(500).json({
+			error: true,
+			message: error.message || 'Error refreshing token',
 		})
 	}
 }
